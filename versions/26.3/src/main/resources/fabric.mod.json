@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "extended-hitcolor",
+	"version": "${version}",
+	"name": "Extended HitColor",
+	"description": "Applies the damage flash overlay to entity armor and adds an in-game color picker GUI.",
+	"authors": [
+		"xkzuto"
+	],
+	"contact": {
+		"homepage": "https://github.com/xkzuto96/extended-hitcolor",
+		"sources": "https://github.com/xkzuto96/extended-hitcolor",
+		"discord": "xkzuto",
+		"github": "https://github.com/xkzuto96"
+	},
+	"license": "MIT",
+	"icon": "assets/extended-hitcolor/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"xkzuto.hitcolor.ExtendedHitcolor"
+		],
+		"client": [
+			"xkzuto.hitcolor.client.ExtendedHitColorClient"
+		],
+		"modmenu": [
+			"xkzuto.hitcolor.client.compat.ModMenuCompat"
+		]
+	},
+	"mixins": [
+		"extended-hitcolor.mixins.json",
+		{
+			"config": "extended-hitcolor.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "26.3",
+		"java": ">=25",
+		"fabric-api": ">=0.162.0+26.3"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}

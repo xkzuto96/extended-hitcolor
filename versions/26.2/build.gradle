@@ -1,0 +1,8 @@
+sourceSets {
+	client {
+		java.srcDirs = [
+			rootProject.file("common/src/client/java"),
+			"src/client/java"
+		]
+	}
+}

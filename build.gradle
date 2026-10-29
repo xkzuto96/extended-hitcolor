@@ -1,0 +1,101 @@
+plugins {
+	id 'base'
+	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
+	id 'maven-publish'
+}
+
+subprojects {
+	apply plugin: 'net.fabricmc.fabric-loom'
+	apply plugin: 'maven-publish'
+
+	version = "${rootProject.mod_version}+mc${project.minecraft_version}"
+	group = rootProject.maven_group
+
+	base {
+		archivesName = rootProject.archives_base_name
+	}
+
+	repositories {
+		maven { url "https://maven.terraformersmc.com/releases/" }
+	}
+
+	loom {
+		splitEnvironmentSourceSets()
+
+		mods {
+			"extended-hitcolor" {
+				sourceSet sourceSets.main
+				sourceSet sourceSets.client
+			}
+		}
+	}
+
+	sourceSets {
+		main {
+			java.srcDirs = [
+				rootProject.file("common/src/main/java"),
+				"src/main/java"
+			]
+			resources.srcDirs = [
+				rootProject.file("common/src/main/resources"),
+				"src/main/resources"
+			]
+		}
+		client {
+			java.srcDirs = [
+				rootProject.file("common/src/client/java"),
+				"src/client/java"
+			]
+			resources.srcDirs = [
+				rootProject.file("common/src/client/resources"),
+				"src/client/resources"
+			]
+		}
+	}
+
+	dependencies {
+		minecraft "com.mojang:minecraft:${project.minecraft_version}"
+		implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+		implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+		clientCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+	}
+
+	processResources {
+		inputs.property "version", rootProject.mod_version
+		inputs.property "minecraft_version", project.minecraft_version
+
+		filesMatching("fabric.mod.json") {
+			expand "version": rootProject.mod_version,
+			       "minecraft_version": project.minecraft_version
+		}
+	}
+
+	tasks.withType(JavaCompile).configureEach {
+		it.options.release = 25
+	}
+
+	java {
+		withSourcesJar()
+		sourceCompatibility = JavaVersion.VERSION_25
+		targetCompatibility = JavaVersion.VERSION_25
+	}
+
+	jar {
+		from(rootProject.file("LICENSE")) {
+			rename { "${it}_${project.base.archivesName.get()}" }
+		}
+	}
+}
+
+tasks.register('copyArtifacts', Copy) {
+	subprojects.each { subproject ->
+		dependsOn subproject.tasks.named('build')
+		from subproject.tasks.named('jar')
+	}
+	into layout.buildDirectory.dir("libs")
+}
+
+tasks.named('build') {
+	dependsOn 'copyArtifacts'
+}
